@@ -1,12 +1,3 @@
-{-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE ImplicitParams #-}
-{-# LANGUAGE ImportQualifiedPost #-}
-{-# LANGUAGE MagicHash #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE UnboxedTuples #-}
-
 module UnconditionalJump
   ( -- * Labels
     Label,
@@ -15,11 +6,6 @@ module UnconditionalJump
 
     -- ** Derived @label@ variants
     label',
-
-    -- ** Implicit labels
-    Abort,
-    stick,
-    abort,
   )
 where
 
@@ -46,7 +32,7 @@ label f = do
       then pure (unsafeCoerce x)
       else throwIO err
 
--- | @label'@ is provided for the common use case of distinguishing between returning early from a block and reaching
+-- | Like 'label', but for the common use case of distinguishing between returning early from a block and reaching
 -- the end of a block at the value level.
 --
 -- For example, you may wish to tag early-returned values with a @Left@:
@@ -68,19 +54,6 @@ label' f g action =
 goto :: Label a -> a -> IO x
 goto (Label f) x =
   f x
-
-type Abort a =
-  (?abort :: Label a)
-
--- | \"Stick\" a label @l@, making any @abort x@ call in the given argument equivalent to @goto l x@.
-stick :: Label a -> ((Abort a) => b) -> b
-stick g x = let ?abort = g in x
-
--- | Abort to the stuck label.
-abort :: (Abort a) => a -> IO x
-abort x =
-  case ?abort of
-    Label f -> f x
 
 data X = forall a. X {-# UNPACK #-} !Int a
 
