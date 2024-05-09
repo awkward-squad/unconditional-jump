@@ -6,10 +6,11 @@ module UnconditionalJump
 
     -- ** Derived @label@ variants
     label',
+    labelE,
   )
 where
 
-import Control.Exception (Exception (..), asyncExceptionFromException, asyncExceptionToException, catch, throwIO)
+import Control.Exception (Exception (..), SomeException, asyncExceptionFromException, asyncExceptionToException, catch, throwIO)
 import Data.Functor.Contravariant (Contravariant (contramap))
 import IntSupply (IntSupply)
 import IntSupply qualified
@@ -32,33 +33,35 @@ label f = do
       then pure (unsafeCoerce x)
       else throwIO err
 
--- | Like 'label', but for the common use case of distinguishing between returning early from a block and reaching
--- the end of a block at the value level.
---
--- For example, you may wish to tag early-returned values with a @Left@:
---
+-- |
 -- @
--- result <-
---   label' Left Right \\l ->
---     ...
---
--- case result of
---   Left _ -> {- returned early -}
---   Right _ -> {- reached the end of the block -}
+-- label' f g h = label (fmap g . h . contramap f)
 -- @
 label' :: (a -> c) -> (b -> c) -> (Label a -> IO b) -> IO c
 label' f g action =
   label (fmap g . action . contramap f)
 
+-- |
+-- @
+-- labelE = label' Left Right
+-- @
+labelE :: (Label a -> IO b) -> IO (Either a b)
+labelE =
+  label' Left Right
+
 -- | Go to a label.
-goto :: Label a -> a -> IO x
+goto :: Label a -> a -> IO notreached
 goto (Label f) x =
   f x
 
 data X = forall a. X {-# UNPACK #-} !Int a
 
+-- Make X an async exception so it's less likely to be caught and ignored
 instance Exception X where
+  toException :: X -> SomeException
   toException = asyncExceptionToException
+
+  fromException :: SomeException -> Maybe X
   fromException = asyncExceptionFromException
 
 instance Show X where
