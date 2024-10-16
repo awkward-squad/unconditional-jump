@@ -1,15 +1,15 @@
 cabal-version: 2.4
 
 category: Data
-author: Mitchell Rosen, Travis Staton
+author: Mitchell Dalvi Rosen, Travis Staton
 bug-reports: https://github.com/awkward-squad/unconditional-jump/issues
 build-type: Simple
-copyright: (c) 2024 Mitchell Rosen, Travis Staton
+copyright: (c) 2024 Mitchell Dalvi Rosen, Travis Staton
 description: Unconditional jumps.
 homepage: https://github.com/awkward-squad/unconditional-jump
 license: BSD-3-Clause
 license-file: LICENSE
-maintainer: Mitchell Rosen <mitchellwrosen@gmail.com>, Travis Staton <hello@travisstaton.com>
+maintainer: Mitchell Dalvi Rosen <mitchellwrosen@gmail.com>, Travis Staton <hello@travisstaton.com>
 name: unconditional-jump
 synopsis: Unconditional jumps
 tested-with: GHC == 9.6.5, GHC == 9.8.2, GHC == 9.10.1
