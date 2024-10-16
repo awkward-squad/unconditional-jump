@@ -5,7 +5,7 @@ module UnconditionalJump
     goto,
 
     -- ** Derived @label@ variants
-    label',
+    labelWith,
     labelE,
   )
 where
@@ -35,19 +35,19 @@ label f = do
 
 -- |
 -- @
--- label' f g h = label (fmap g . h . contramap f)
+-- labelWith f g h = label (fmap g . h . contramap f)
 -- @
-label' :: (a -> c) -> (b -> c) -> (Label a -> IO b) -> IO c
-label' f g action =
+labelWith :: (a -> c) -> (b -> c) -> (Label a -> IO b) -> IO c
+labelWith f g action =
   label (fmap g . action . contramap f)
 
 -- |
 -- @
--- labelE = label' Left Right
+-- labelE = labelWith Left Right
 -- @
 labelE :: (Label a -> IO b) -> IO (Either a b)
 labelE =
-  label' Left Right
+  labelWith Left Right
 
 -- | Go to a label.
 goto :: Label a -> a -> IO notreached
